@@ -1,0 +1,26 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<title>TCE Editor</title>
+	<meta name="description" Content="Tsenix Editor - Rich Text Edit" />
+	<link href="tce_edit/reset.css" rel="stylesheet" type="text/css" />
+	<link href="tce_edit/tce_edit.css" rel="stylesheet" type="text/css" />
+	<script type="text/javascript" src="tce_edit/jquery.js"></script>
+  	<script type="text/javascript" src="tce_edit/tce_edit.min.js"></script>
+	<script>
+	var txtarid, txtarid2;
+	$(function(){
+		txtarid = tsxEd.init({targ:'#test_cont',tools:'format,mark,align,fontsize,font'});
+		txtarid2 = tsxEd.init({targ:'#test_cont2',tools:'format,mark,align,fontsize,font'});
+	});</script>
+</head>
+<body>
+	<span onClick="tsxEd.saveArea({id:txtarid});" style="cursor:pointer;">Сохранить</span>
+	<div class="test_cont"><textarea id="test_cont"><h1>Заголовок</h1><p>Текст абзаца. Много текста.</p><p>Текст абзаца. <b>Жирный текст</b>. Много текста.</p><p>не работают ни один из <strong>сервисов</strong>, <em>даже</em> <span style="text-decoration: underline;">Gmail</span> и <span style="text-decoration: line-through;">hangouts</span></p></textarea></div>
+	<br><br><br>
+	<span onClick="tsxEd.saveArea({id:txtarid2});" style="cursor:pointer;">Сохранить</span>
+	<div class="test_cont"><textarea id="test_cont2"><h1>Заголовок</h1><p>Текст абзаца. Много текста.</p><p>Текст абзаца. <b>Жирный текст</b>. Много текста.</p><p>не работают ни один из <strong>сервисов</strong>, <em>даже</em> <span style="text-decoration: underline;">Gmail</span> и <span style="text-decoration: line-through;">hangouts</span></p></textarea></div>
+</body>
+</html>
