@@ -8,12 +8,12 @@
 	<link href="tce_edit/reset.css" rel="stylesheet" type="text/css" />
 	<link href="tce_edit/tce_edit.css" rel="stylesheet" type="text/css" />
 	<script type="text/javascript" src="tce_edit/jquery.js"></script>
-  	<script type="text/javascript" src="tce_edit/tce_edit.min.js"></script>
+  	<script type="text/javascript" src="tce_edit/tce_edit.js"></script>
 	<script>
 	var txtarid, txtarid2;
 	$(function(){
-		txtarid = tsxEd.init({targ:'#test_cont',tools:'format,mark,align,fontsize,font'});
-		txtarid2 = tsxEd.init({targ:'#test_cont2',tools:'format,mark,align,fontsize,font'});
+		txtarid = tsxEd.init({targ:'#test_cont',tools:'html,format,mark,paint,align,files,list,table,line,spoiler,object,del,movie'});
+		txtarid2 = tsxEd.init({targ:'#test_cont2',tools:'format,mark,align,fontsize,font',disable:true});
 	});</script>
 </head>
 <body>
