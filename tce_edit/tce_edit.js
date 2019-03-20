@@ -17,6 +17,7 @@ function tsxEdClass(){
 			self.eid = 'tsx'+self.uid();
 			self.textarea[self.eid] = p.targ;
 			var tahtml = $(p.targ).val();
+			if(tahtml.trim()==''){tahtml='<p></p>';}
 			tahtml = (tahtml)?tahtml.replace(new RegExp('src="edit/uploads','gm'),'src="/edit/uploads'):'';
 			var toolslist = '';
 			if(p && p.tools){
@@ -417,7 +418,9 @@ function tsxEdClass(){
 								self.restoreRange({id:p.id});
 								document.execCommand('insertHTML', false, imglist);
 							}
-						};
+						}else{
+							$('#'+p.id+' .tce_content').append(imglist);
+						}
 					}else{
 						$('#'+p.id+' .tce_content').append(imglist);
 					}
