@@ -387,11 +387,9 @@ function tsxEdClass(){
 			apply:function(p){var file = (p.val=='file')?'txt,pdf,doc,docx,xls,xlsx':false; scHp.filesOpen(p.id,file); },
 			add:function(p){
 				if(p.id && p.file==true){
-					if(typeof self.param[p.id] != 'undefined'){
-						if(self.param[p.id].cont){
-							self.restoreRange({id:p.id});
-							document.execCommand('insertHTML', false, p.list);
-						};
+					if(typeof self.param[p.id] != 'undefined' && typeof self.param[p.id].cont != 'undefined'){
+						self.restoreRange({id:p.id});
+						document.execCommand('insertHTML', false, p.list);
 					}else{
 						$('#'+p.id+' .tce_content').append('<p>'+p.list+'</p>');
 					}
@@ -465,11 +463,9 @@ function tsxEdClass(){
 					}
 					res += '<tr>'+td+'</tr>';
 				}
-				res += '</table></div>';			
-				if(typeof self.param[p.id] != 'undefined'){
-					if(self.param[p.id].cont){
-						$(self.param[p.id].cont).after(res);
-					};
+				res += '</table></div>';
+				if(typeof self.param[p.id] != 'undefined' && typeof self.param[p.id].cont != 'undefined'){
+					$(self.param[p.id].cont).after(res);
 				}else{
 					$('#'+p.id+' .tce_content').append(res);
 				}
@@ -602,18 +598,27 @@ function tsxEdClass(){
 		if(p.id){
 			var id = p.id;
 			if($('#sc_code_editor_'+id).length && $('#sc_code_editor_'+id).css('display')=='block'){
-				$('#'+id+' .tce_content').html($('#sc_code_editor_'+id).text()).show();
+				var code = $('#sc_code_editor_'+id).text();
+				if(code){code = self.clearCode(code);}
+				$('#'+id+' .tce_content').html(code).show();
 				$('#sc_code_editor_'+id).hide();
 				$('#'+id+' .tce_tools_c').removeClass('sc_html_mode');
 			}else{
 				self.closePop({id:p.id});
 				var text = $('#'+id+' .tce_content').html();
-				text = self.formatCode(text);
+				text = self.formatCode(self.clearCode(text));
 				$('#sc_code_editor_'+id).text(text).show().focus();
 				$('#'+id+' .tce_content').hide();
 				$('#'+id+' .tce_tools_c').addClass('sc_html_mode');
 			};
 		};
+	}
+	
+	this.clearCode = function(t){
+		if(t){
+			t = t.replace(/<p><br><\/p>/gi, '').replace(/<p>\n<br><\/p>/gi, '').replace(/<p><\/p>/gi, '');
+		}
+		return t;
 	}
 	
 	this.formatCode = function(t){
