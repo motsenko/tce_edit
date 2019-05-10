@@ -1,6 +1,9 @@
+/* TCE EDIT Open Source  |  https://github.com/tsenix/tce_edit  |   https://tsenix.com  */
 function tsxEdClass(){
 	this.eid = 0;
+	this.custom_style = [{n:'Таблица с рамками',v:'price'}];
 	this.param = {};
+	this.activelink = false;
 	this.textarea = {};
 	this.font_array = {
 		arial:'Arial, Helvetica, sans-serif',
@@ -27,6 +30,22 @@ function tsxEdClass(){
 						toolslist += self.tools[toolarr[i]].button({id:self.eid});
 					};
 				}
+			}
+			if(p && p.styles){
+				var stylesarr = p.styles.split(',');
+				for(var psi1 in stylesarr){
+					if(stylesarr[psi1]){
+						var stylesarr2 = stylesarr[psi1].split(';');
+						if(stylesarr2[1]){
+							self.custom_style.push({n:stylesarr2[0],v:stylesarr2[1]});
+						}else{
+							self.custom_style.push({n:stylesarr2[0],v:stylesarr2[0]});
+						}
+					}
+				}
+			}
+			if(p && p.activelink==true){
+				self.activelink = true;
 			}
 			var tools = (toolslist)?'<div data-id="'+self.eid+'" class="tce_tools_c">'+toolslist+'</div>':'';
 			var contedit = (p && p.disable==true)?'':' contenteditable="true"';
@@ -61,16 +80,6 @@ function tsxEdClass(){
 				}
 			});
 
-			/*
-			$('#'+self.eid).on('paste', function(e){
-				var xid = $(e.target).parents('.tce_content_c').attr('id');
-				self.pasteFormat({e:e,id:xid});
-			});
-			$('#sc_code_editor_'+self.eid).on('paste', function(e){
-				console.log(22);
-				var xid = $(e.target).parents('.tce_content_c').attr('id');
-				self.pasteCodeFormat({e:e,id:xid});
-			}); */
 			$('#sc_code_editor_'+self.eid).on('keydown', function(e){
 				var xid = $(e.target).parents('.tce_content_c').attr('id');
 				if($(e.target).hasClass('sc_code_editor_c')){
@@ -89,14 +98,25 @@ function tsxEdClass(){
 				var xid = $(e.target).parents('.tce_content_c').attr('id');
 				self.keyUp({e:e,id:xid});
 			});
-			/*
-			$('#'+self.eid).on('mousedown','.tce_tools_c',function(e){
-				var xid = $(this).attr('data-id');
-				self.saveRange({id:xid});
-				console.log('mouseup');
-				setTimeout(function(){console.log('rest'); self.restoreRange({id:xid}); $('#'+xid+' .tce_content').focus(); },500);
-			}); */
-			
+			$('#'+self.eid).on('keydown', function(e){
+				var xid = $(e.target).parents('.tce_content_c').attr('id');
+				if(e.keyCode==13){
+					if($(self.param[xid].cont) && $(self.param[xid].cont).get(0).tagName.toLowerCase()=='div'){
+						$(self.param[xid].cont).after('<p id="tce-replacer"></p>');
+						self.detectEl({id:'#'+xid+' #tce-replacer'});
+						rng = document.createRange();
+						rng.selectNodeContents(document.getElementById("tce-replacer"));
+						rng.collapse(false);
+						sel = window.getSelection();
+						sel.removeAllRanges();
+						sel.addRange( rng );  
+						$('#'+xid+' #tce-replacer').removeAttr('id');
+						e.stopPropagation();
+						return false;
+					};
+				}
+			});			
+
 			$('#'+self.eid+' .tce_content').on('click','img,p,h1,h2,h3,h4,li,ul,ol,td,th,table,blockquote,a,b,strong,i,em,u,s,strike,span,div',function(e){
 				e.stopPropagation();
 				if(p.disable!=true){self.editElm({e:e,t:this}); };
@@ -110,7 +130,6 @@ function tsxEdClass(){
 			$('#'+self.eid).on('click','.tce_tools_btn',function(e){
 				var xid = $(this).parents('.tce_content_c').attr('id');
 				if(xid && p.disable!=true){
-					//$('#'+xid+' .tce_content').focus();
 					self.restoreRange({id:xid});
 					e.stopPropagation();
 					$(this).parent().find('.tce_tools_btn_active').removeClass('tce_tools_btn_active');
@@ -363,7 +382,7 @@ function tsxEdClass(){
 				}
 			},
 			dptool:function(p){
-				var colors = ['#f44336','#ff9800','#ffc107','#ffeb3b','#8bc34a','#4caf50','#009688','#03a9f4','#3f51b5','#673ab7','#9c27b0','null'];
+				var colors = (p && p.val=='backColor')? ['#ffcdd2','#ffb74d','#ffd54f','#fff176','#aed581','#a5d6a7','#80cbc4','#81d4fa','#9fa8da','#b39ddb','#ce93d8','null'] : ['#f44336','#ff9800','#ffc107','#ffeb3b','#8bc34a','#4caf50','#009688','#03a9f4','#3f51b5','#673ab7','#9c27b0','null'];
 				var res = '<span class="tce_tools_btn_c tce_btn_paint_c">';
 				for(var i=0; i<colors.length; i++){
 					res += '<span data-action="paint" data-val="'+p.val+'" data-color="'+colors[i]+'" style="background:'+colors[i]+';" class="tce_tools_btn"></span>';
@@ -636,6 +655,53 @@ function tsxEdClass(){
 			},
 			sel:function(p){}
 		},
+		style:{
+			button:function(p){return '<span class="tce_tools_btn_c tce_btn_style_c"><span data-action="style" data-val="show" title="Стили" class="tce_tools_btn tce_style-i"></span></span>';},
+			apply:function(p){
+				if(p.action=='addstyle'){
+					if(self.param[p.id].cont){
+						var sel = $('#'+p.id+' .tce_tools_pop_c select[name=cstyle] option:selected').val();
+						var stylearr = [];
+						for(var is3 in self.custom_style){if(self.custom_style[is3].v){stylearr.push(self.custom_style[is3].v); } }
+						var newstyle = '';
+						var csstyle = self.param[p.id].cont.attr('class');
+						if(csstyle){
+							var csstylearr = csstyle.split(' ');
+							for(var i=0; i<csstylearr.length;i++){
+								if(self.inArray(csstylearr[i],stylearr)){
+									/* skip */
+								}else{
+									newstyle += csstylearr[i]+' ';
+								}
+							}
+						}
+						if(sel){newstyle += sel+' ';}
+						self.param[p.id].cont.attr('class',newstyle.trim());
+						self.closePop({id:p.id});
+					}
+				}else{
+					self.closePop({id:p.id});
+					if(self.param[p.id].cont){
+						var option = '';
+						var csstylearr = [];
+						var csstyle = self.param[p.id].cont.attr('class');
+						if(csstyle){csstylearr = csstyle.split(' '); };
+						for(var is3 in self.custom_style){
+							if(self.custom_style[is3].v){
+								var selected = (self.inArray(self.custom_style[is3].v,csstylearr))?' selected':'';
+								option += '<option'+selected+' value="'+self.custom_style[is3].v+'">'+self.custom_style[is3].n+'</option>'; 
+							}
+						}
+						var content = '<div class="tce_tools_pop_form_c">'+
+							'<div class="tce_tools_pop_form_i"><label>Название стиля</label><select name="cstyle"><option value="">Без стиля</option>'+option+'</select></div>'+
+						'</div>';
+						var button = [{title:'OK',tools:'style',action:'addstyle',active:1}, {title:'Отмена',action:'close'}];
+						self.addPop({id:p.id,title:'Дополнительный стиль',content:content,button:button});
+					}
+				};
+			},
+			sel:function(p){}
+		},
 		/*******/
 		movie:{
 			button:function(p){return '<span class="tce_tools_btn_c tce_btn_movie_c"><span data-action="movie" title="Опустить вниз" class="tce_tools_btn tce_movie-down"></span><span data-action="movie" title="Поднять вверх" data-val="up" class="tce_tools_btn tce_movie-up"></span></span>';},
@@ -785,6 +851,13 @@ function tsxEdClass(){
 		$('#sc_visual_minipan_'+p.id).fadeIn(300);
 	}
 	
+	this.inArray = function(value, array){
+		for(var i = 0; i < array.length; i++){
+			if(array[i] == value) return true;
+		}
+		return false;
+	}
+	
 	this.addDpTool = function(p){
 		if(p && p.id && p.tool){
 			$('#'+p.id+' .tce_dp_tools_c').remove();
@@ -871,6 +944,10 @@ function tsxEdClass(){
 			if(self.param[xid].tagname=='b' || self.param[xid].tagname=='strong' || self.param[xid].tagname=='i' || self.param[xid].tagname=='em' || self.param[xid].tagname=='u' || self.param[xid].tagname=='s' || self.param[xid].tagname=='strike' || self.param[xid].tagname=='span'){
 				self.tools['mark'].sel({tn:self.param[xid].tagname,id:xid});
 			}else if(self.param[xid].tagname=='a'){
+				if(self.activelink==true){
+					var href = $(self.param[xid].el).attr('href');
+					if(href){window.open(href); };
+				};
 				self.tools['paint'].sel({tn:self.param[xid].tagname,id:xid});
 			}else if(self.param[xid].tagname=='img'){
 				self.tools['img'].sel({tn:self.param[xid].tagname,id:xid});

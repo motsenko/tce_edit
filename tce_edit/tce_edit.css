@@ -46,6 +46,7 @@
 		.tce_tools_btn.tce_paint-tm{background-image:url(tce-ic-painttm.svg);}
 		.tce_tools_btn.tce_paint-link{background-image:url(tce-ic-paintlink.svg);}
 		.tce_tools_btn.tce_html-i{background-image:url(tce-ic-html.svg); background-size:16px auto;}
+		.tce_tools_btn.tce_style-i{background-image:url(tce-ic-style.svg); background-size:16px auto;}
 		
 		.tce_tools_btn.tce_img-add{background-image:url(tce-ic-img.svg); background-size:16px auto;}
 		.tce_tools_btn.tce_file-add{background-image:url(tce-ic-file.svg); background-size:16px auto;}
@@ -166,6 +167,7 @@ box-shadow: 0px 0 15px 0 rgba(0,0,0,0.3); -webkit-box-shadow: 0px 0 15px 0 rgba(
 .tce_tools_pop_form_c{padding:10px;}
 .tce_tools_pop_form_i{line-height:32px;}
 	.tce_tools_pop_form_i label{display:inline-block; min-width:80px; font-size:12px; color:#666; text-align:right; margin:0 10px 0 0;}
+	.tce_tools_pop_form_i select{outline:none; color:#333; line-height:19px; border:1px solid #F2F2F2; padding:2px 5px; margin:0; font-size:12px;}	
 	.tce_tools_pop_form_i input{outline:none; color:#333; line-height:19px; border:1px solid #F2F2F2; padding:2px 5px; margin:0; background:#F2F2F2; min-width:240px; font-size:12px;}
 	.tce_tools_pop_form_i input:focus{border:1px solid #4f72b8; background:#fff;}
 	.tce_tools_pop_form_i input.error{background:#ffeeee; border: 1px solid #ffeeee;}
