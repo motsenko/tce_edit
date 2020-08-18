@@ -3,6 +3,7 @@ function tsxEdClass(){
 	this.eid = 0;
 	this.custom_style = [{n:'Таблица с рамками',v:'price'}];
 	this.param = {};
+	this.tmp = [];
 	this.activelink = false;
 	this.textarea = {};
 	this.font_array = {
@@ -332,15 +333,18 @@ function tsxEdClass(){
 							$('#'+p.id+' .tce_tools_pop_c input[name=text]').removeClass('error'); 
 						}
 					var title = $('#'+p.id+' .tce_tools_pop_c input[name=title]').val();
+					var rel = $('#'+p.id+' .tce_tools_pop_c select[name=rel] option:selected').val();
 					var blank = $('#'+p.id+' .sc_frame_form_xcheckbox').hasClass('checked');
 					if(self.param[p.id].tagname=='a'){
 						$(self.param[p.id].el).attr('href',src).text(text);
 						if(title){$(self.param[p.id].el).attr('title',title); }
 						if(blank){$(self.param[p.id].el).attr('target','_blank'); }
+						if(rel){$(self.param[p.id].el).attr('rel',rel); }else{$(self.param[p.id].el).removeAttr('rel'); }
 					}else{
 						self.restoreRange({id:p.id});
 						var blank = (blank)?' target="_blank"':'';
-						document.execCommand('insertHTML', false, '<a'+blank+' href="'+src+'">'+text+'</a>');
+						var arel = (rel)?' rel="'+rel+'"':'';
+						document.execCommand('insertHTML', false, '<a'+arel+blank+' href="'+src+'">'+text+'</a>');
 					}
 					self.closePop({id:p.id});
 				}else{
@@ -361,18 +365,26 @@ function tsxEdClass(){
 							var text = (wgsel)?wgsel:'';
 							var title = '';
 							var blank = '';
+							var opt = '';
 							if(self.param[p.id].tagname=='a'){
 								var src = $(self.param[p.id].el).attr('href');
 								var text = $(self.param[p.id].el).text();
 								var title = $(self.param[p.id].el).attr('title');
+								var rel = $(self.param[p.id].el).attr('rel');
 								title = (title)?title:'';
 								var blank = ($(self.param[p.id].el).attr('target')=='_blank')?' checked':'';
+							}
+							var opt_arr = ['','nofollow','sponsored','ugc'];
+							for(var i = 0; i < opt_arr.length; i++){
+								var sel = (rel==opt_arr[i])?' selected':'';
+								opt += '<option'+sel+' value="'+opt_arr[i]+'">'+opt_arr[i]+'</option>';
 							}
 							var ltext = self.param[p.id].range;
 							var content = '<div class="tce_tools_pop_form_c">'+
 							'<div class="tce_tools_pop_form_i"><label>Адрес ссылки</label><input value="'+src+'" placeholder="https://" name="src" type="text" /></div>'+
 							'<div class="tce_tools_pop_form_i"><label>Текст ссылки</label><input value="'+text+'" name="text" value="'+ltext+'" type="text" /></div>'+
 							'<div class="tce_tools_pop_form_i"><label>Заголовок</label><input value="'+title+'" name="title" type="text" /></div>'+
+							'<div class="tce_tools_pop_form_i"><label>rel</label><select name="rel">'+opt+'</select></div>'+
 							'<div class="tce_tools_pop_form_i"><label></label><span onclick="$(this).children().toggleClass(\'checked\');" class="sc_frame_form_xlable"><span name="blank" data-value="1" class="sc_frame_form_checkbox sc_frame_form_xcheckbox'+blank+'"></span> Открывать в новом окне</span></div>'+
 							'</div>';
 							var button = [{title:'OK',tools:'paint',action:'addlink',active:1}, {title:'Отмена',action:'close'}];
@@ -457,7 +469,7 @@ function tsxEdClass(){
 					{tool:'img',action:'nofloat',css:'tce_img-nofloat',title:'Без обтекания'},
 					{tool:'img',action:'floatleft',css:'tce_img-floatleft',title:'Обтекание по левому краю'},
 					{tool:'img',action:'floatright',css:'tce_img-floatright',title:'Обтекание по правому краю'},
-					/*{tool:'img',action:'param',css:'tce_img-param'},*/
+					{tool:'img',action:'param',css:'tce_img-param'}
 				]); 
 			},
 			nofloat:function(p){
@@ -469,7 +481,28 @@ function tsxEdClass(){
 			floatright:function(p){
 				$(self.param[p.id].el).removeClass('lfs-fl-left lfs-fl-right').addClass('lfs-fl-right').click();
 			},
-			param:function(p){},
+			apply:function(p){
+				var alt = $('#'+p.id+' .tce_tools_pop_c input[name=alt]').val();
+				var all = $('#'+p.id+' .sc_frame_form_xcheckbox').hasClass('checked');
+				if(alt){
+					$(self.tmp).attr('alt',alt);
+					if(all){	
+						$('#'+p.id+' .tce_content img').attr('alt',alt);
+					}
+				};
+				self.closePop({id:p.id});
+			},
+			param:function(p){
+				self.tmp = self.param[p.id].el;
+				var alt = $(self.param[p.id].el).attr('alt');
+				alt = (alt)?alt:'';
+				var content = '<div class="tce_tools_pop_form_c">'+
+				'<div class="tce_tools_pop_form_i"><label>Alt</label><input value="'+alt+'" name="alt" type="text" /></div>'+
+				'<div class="tce_tools_pop_form_i"><label></label><span onclick="$(this).children().toggleClass(\'checked\');" class="sc_frame_form_xlable"><span name="all" data-value="1" class="sc_frame_form_checkbox sc_frame_form_xcheckbox"></span> Применить ко всем на странице</span></div>'+
+				'</div>';
+				var button = [{title:'OK',tools:'img',action:'addalt',active:1}, {title:'Отмена',action:'close'}];
+				self.addPop({id:p.id,title:'Свойства изображения',content:content,button:button});
+			},
 		},
 		/*******/
 		list:{
